@@ -16,7 +16,7 @@ import android.widget.DatePicker.OnDateChangedListener;
 
 public class MainActivity extends Activity {
 
-	DBManager db = new DBManager(this);
+	DBManager db;
 	
 	Button btn;
 	DatePicker fromDp, toDp;
@@ -64,21 +64,37 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		db = new DBManager(this);
+		
 		fromDp = (DatePicker)findViewById(R.id.fromDatePicker);
 		toDp = (DatePicker)findViewById(R.id.toDatePicker);
 		tv = (TextView)findViewById(R.id.textView);
 		btn = (Button)findViewById(R.id.button);
 		init();
 		
+		//db.addItem(new ItemBean("abc", "abc", 1.234, true, 1, "2015-05-26"));
+		
 		btn.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				String fromDate = ""+fromYear+"-"+fromMonth+"-"+fromDay;
-				String toDate = ""+toYear+"-"+toMonth+"-"+toDay;
+				String fromDate, toDate;
+				fromDate = ""+fromYear;
+				fromDate += "-"+(fromMonth>9?fromMonth:("0"+fromMonth));
+				fromDate += "-"+(fromDay>9?fromDay:("0"+fromDay));
+				toDate = ""+toYear;
+				toDate += "-"+(toMonth>9?toMonth:("0"+toMonth));
+				toDate += "-"+(toDay>9?toDay:("0"+toDay));
+				List<ItemBean> lit = db.listItems("abc");
+				String res = "" + lit.size() + "\n";
+				for (int i=0; i<lit.size(); i++) {
+					res += lit.get(i).toString()+"\n";
+				}
+				res += "------------------------------------\n";
 				List<ItemBean> li = db.listItemsByTime("abc", fromDate, toDate);
-				String res = new String();
+				res += "" + li.size() + "\n";
 				for (int i=0; i<li.size(); i++) {
 					res += li.get(i).toString()+"\n";
 				}

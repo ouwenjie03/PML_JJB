@@ -20,13 +20,13 @@ public class ItemBean {
 	}
 	public void setUserId(String userId) {
 		this.userId = userId;
+		this.userId = "abc"; // offline
 	}
 	public String getName() {
 		return name;
 	}
 	public void setName(String name) {
 		this.name = name;
-		this.name = "abc"; // offline
 	}
 	public double getPrice() {
 		return price;
@@ -64,11 +64,11 @@ public class ItemBean {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public ItemBean(long id, String userId, String name, double price,
+	public ItemBean(String userId, String name, double price,
 			boolean isOut, int classify, String time) {
 		super();
-		this.id = id;
 		this.userId = userId;
+		this.userId = "abc";
 		this.name = name;
 		this.price = price;
 		this.isOut = isOut;

@@ -86,8 +86,8 @@ public class DBManager {
 			String toDatetime) {
 
 		Cursor c = db.query("item_table", null,
-				"userid=? and time>=? and time<=?", new String[] { userId,
-						fromDatetime, toDatetime}, null, null, "time");
+				"userid=? and date(time)>=date(?) and date(time)<=date(?)", new String[] { userId,
+						fromDatetime, toDatetime}, null, null, "date(time)");
 
 		List<ItemBean> res = new ArrayList<ItemBean>();
 
