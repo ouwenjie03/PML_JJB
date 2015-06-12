@@ -9,7 +9,6 @@ import com.jjb.util.DBManager;
 import com.jjb.util.ItemBean;
 
 import android.app.ActionBar.LayoutParams;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -34,7 +33,7 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
 	private EditText item;
 	private EditText price;
 	private RadioGroup radio;

@@ -9,7 +9,6 @@ import com.jjb.util.DBManager;
 import com.jjb.util.ItemBean;
 
 import android.os.Bundle;
-import android.app.Activity;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,7 +17,7 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.DatePicker.OnDateChangedListener;
 
-public class SelectActivity extends Activity {
+public class SelectActivity extends BaseActivity {
 
 	DBManager db;
 	

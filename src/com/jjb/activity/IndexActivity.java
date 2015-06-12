@@ -1,12 +1,11 @@
 package com.jjb.activity;
 
-import com.baidu.voicerecognition.android.VoiceRecognitionConfig;
 import com.baidu.voicerecognition.android.ui.BaiduASRDigitalDialog;
 import com.baidu.voicerecognition.android.ui.DialogRecognitionListener;
 import com.jjb.R;
+import com.jjb.util.Constant;
 import com.jjb.widget.SinkingView;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -14,10 +13,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 /**
- * 主页Activity
+ * 主页Activity，包含一个波浪球和一个百度云语音
  * @author Robert Peng
  */
-public class IndexActivity extends Activity {
+public class IndexActivity extends BaseActivity {
 	private BaiduASRDigitalDialog mDialog = null;
 
 	private DialogRecognitionListener mRecognitionListener;
@@ -67,33 +66,33 @@ public class IndexActivity extends Activity {
 				
 				// API Key
 				params.putString(BaiduASRDigitalDialog.PARAM_API_KEY,
-						"1WXU1vV4CpQMAYwpZZ0votkx");
+						Constant.BAIDU_API_KEY);
 				params.putString(BaiduASRDigitalDialog.PARAM_SECRET_KEY,
-						"4azgbTE5iocck26iCMAzx8U4TxzOZmK4");
+						Constant.BAIDU_SECRET_KEY);
 				// 设定对话框主题
 				params.putInt(BaiduASRDigitalDialog.PARAM_DIALOG_THEME,
-						BaiduASRDigitalDialog.THEME_BLUE_LIGHTBG);
+						Constant.BAIDU_DIALOG_THEME);
 				// 设定识别领域
 				params.putInt(BaiduASRDigitalDialog.PARAM_PROP,
-						VoiceRecognitionConfig.PROP_FINANCE);
+						Constant.BAIDU_PROP);
 				// 设定语言
 				params.putString(
 						BaiduASRDigitalDialog.PARAM_LANGUAGE,
-						VoiceRecognitionConfig.LANGUAGE_CHINESE);
+						Constant.BAIDU_LANGUAGE);
 				// 设定提示音播放
 				params.putBoolean(
 						BaiduASRDigitalDialog.PARAM_START_TONE_ENABLE,
-						true);
+						Constant.BAIDU_START_TONE_ENABLE);
 				params.putBoolean(
 						BaiduASRDigitalDialog.PARAM_END_TONE_ENABLE,
-						true);
+						Constant.BAIDU_END_TONE_ENABLE);
 				params.putBoolean(
 						BaiduASRDigitalDialog.PARAM_TIPS_TONE_ENABLE,
-						true);
+						Constant.BAIDU_TIP_TONE_ENABLE);
 				// 设定语义识别
 				params.putBoolean(
 						BaiduASRDigitalDialog.PARAM_NLU_ENABLE,
-						true);
+						Constant.BAIDU_NLU_ENABLE);
 
 				// 生成对话框对象，设置回调函数
 				mDialog = new BaiduASRDigitalDialog(IndexActivity.this, params);
