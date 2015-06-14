@@ -18,7 +18,9 @@ import android.os.Bundle;
  */
 public abstract class BaseActivity extends Activity {
 	
-	protected BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {  
+	// TODO 通过设定一个所有Activity都有的menu，放置一个关闭app的按钮，点击后发送关闭app的广播
+	
+	protected BroadcastReceiver appCloseReceiver = new BroadcastReceiver() {  
         @Override  
         public void onReceive(Context context, Intent intent) {  
             finish();  
@@ -32,15 +34,15 @@ public abstract class BaseActivity extends Activity {
 	@Override  
     public void onResume() {  
         super.onResume();  
-        // 在当前的activity中注册广播  
+        // 注册关闭app的广播  
         IntentFilter filter = new IntentFilter();  
         filter.addAction(Constant.EXIT_APP_ACTION);
-        this.registerReceiver(this.broadcastReceiver, filter); 
+        this.registerReceiver(this.appCloseReceiver, filter);
     }  
       
     @Override  
     protected void onPause() {
-        this.unregisterReceiver(this.broadcastReceiver);  
+        this.unregisterReceiver(this.appCloseReceiver);  
         super.onPause();
     }
 

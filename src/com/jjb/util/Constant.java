@@ -8,9 +8,19 @@ import com.baidu.voicerecognition.android.ui.BaiduASRDigitalDialog;
 
 @SuppressLint("SimpleDateFormat")
 public class Constant {
+	// 用户相关常量
+	public static int USER_ID = 0;
+	public static String ACCESS_KEY = "";
+	
+	// 服务器相关常量
+	public static final String HOST_NAME = "http://192.168.0.1:8080/";
+	
+	// 数据库相关常量
+	public static final String TABLE_NAME = "item";
 	
 	// DateFormat相关常量
-	public static final SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	public static final SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	public static final SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
 	public static final SimpleDateFormat MONTH_FORMAT = new SimpleDateFormat("MM");
 	public static final SimpleDateFormat DAY_FORMAT = new SimpleDateFormat("dd");
@@ -31,7 +41,10 @@ public class Constant {
 	
 	// SharedPreferences Key
 	public static final String PREF_USER_INFO = "userInfo";
+	public static final String PREF_USERID = "userID";
 	public static final String PREF_ACCESS_KEY = "accessKey";
+	public static final String PREF_EXPIRES_TIME = "expiresTime";
+	public static final String PREF_LAST_SYNC = "lastSync";
 	public static final String PREF_AUTO_LOGIN_ENABLE = "autoLogin";
 	
 	// Bundle Key

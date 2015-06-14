@@ -40,7 +40,7 @@ public class SignInActivity extends BaseActivity {
 					return;
 				}
 				
-				new SignInTask(SignInActivity.this).execute();
+				new SignInTask(SignInActivity.this).execute(userName, password);
 			}
 		});
 	}

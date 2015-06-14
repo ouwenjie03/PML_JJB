@@ -3,6 +3,7 @@ package com.jjb.util;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by user on 15/04/29.
@@ -18,13 +19,22 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		System.out.println("create table!");
-		db.execSQL("CREATE TABLE `item_table` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `userid` VARCHAR(255), `name` NVARCHAR(255), `price` DOUBLE, `isout` BIT, `classify` INT, `time` DATE, `isfinish` INT);");
+		Log.w("JJB", "create table!");
+		db.execSQL("CREATE TABLE `" + Constant.TABLE_NAME + "` ("
+				+ "`id` INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ "`userid` INTEGER,"
+				+ "`name` NVARCHAR(255),"
+				+ "`price` DOUBLE,"
+				+ "`isout` BIT,"
+				+ "`classify` INT,"
+				+ "`occurredTime` TIMESTAMP,"
+				+ "`modifiedTime` TIMESTAMP,"
+				+ "`isfinish` INT);");
+		
+		
 	}
 
 	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-	}
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {}
 
 }

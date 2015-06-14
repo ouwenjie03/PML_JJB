@@ -49,7 +49,7 @@ public class SignUpActivity extends BaseActivity {
 					return;
 				}
 				
-				new SignUpTask(SignUpActivity.this).execute();
+				new SignUpTask(SignUpActivity.this).execute(userName, password);
 			}
 		});
 	}
