@@ -6,10 +6,9 @@ import java.util.List;
 import com.jjb.R;
 import com.jjb.util.Constant;
 import com.jjb.util.DBManager;
-import com.jjb.util.ItemBean;
+import com.jjb.util.Item;
 
 import android.os.Bundle;
-import android.app.Activity;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,7 +17,7 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.DatePicker.OnDateChangedListener;
 
-public class SelectActivity extends Activity {
+public class SelectActivity extends BaseActivity {
 
 	DBManager db;
 	
@@ -91,7 +90,7 @@ public class SelectActivity extends Activity {
 				toDate = ""+toYear;
 				toDate += "-"+(toMonth>9?toMonth:("0"+toMonth));
 				toDate += "-"+(toDay>9?toDay:("0"+toDay));
-				List<ItemBean> li = db.listItemsByTime("abc", fromDate, toDate);
+				List<Item> li = db.listItemsByOccurredTime(Constant.USER_ID, fromDate, toDate);
 				
 				// look here !!!
 				// write the intent !!!

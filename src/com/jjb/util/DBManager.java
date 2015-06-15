@@ -1,19 +1,28 @@
 package com.jjb.util;
 
+import static com.jjb.util.Constant.*;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Created by user on 14/12/12.
+ * Modified by Robert Peng on 15/06/14.
  */
 public class DBManager {
 	private MyDatabaseHelper helper;
 	private SQLiteDatabase db;
+	
+	private static String BY_USERID = "userId=?";
+	private static String BY_ITEMID = "itemId=?";
 
 	public DBManager(Context context) {
 		helper = new MyDatabaseHelper(context, null); // 传入null使用默认factory初始化
@@ -21,32 +30,20 @@ public class DBManager {
 	}
 
 	/**
-	 * 添加任务
-	 * 
-	 * @param itembean
+	 * 添加Item条目
+	 * @param Item 要添加的条目
 	 */
-	public void addItem(ItemBean item) {
-		ContentValues cv = new ContentValues();
-		// cv.put("id", plan.getId()); id is auto_increment, no need
-		cv.put("userid", item.getUserId());
-		cv.put("name", item.getName());
-		cv.put("price", item.getPrice());
-		cv.put("isout", item.isOut());
-		cv.put("classify", item.getClassify());
-		cv.put("time", item.getTime());
-
-		db.insert("item_table", "null", cv);
+	public long addItem(Item item) {
+		return db.insert(TABLE_NAME, "null", parseToCV(item));
 	}
 
 	/**
-	 * 删除 by id
-	 * 
-	 * @param id
+	 * 根据ItemId删除条目
+	 * @param itemId item id
 	 */
-	public void deletePlan(int id) {
-		String whereClause = "id=?";
-		String[] whereArgs = { Integer.toString(id) };
-		db.delete("item_table", whereClause, whereArgs);
+	public void deleteItem(int itemId) {
+		String[] whereArgs = { Integer.toString(itemId) };
+		db.delete(TABLE_NAME, BY_ITEMID, whereArgs);
 	}
 
 	/**
@@ -54,94 +51,115 @@ public class DBManager {
 	 * 
 	 * @param userid
 	 */
-	public List<ItemBean> listItems(String userId) {
+	public List<Item> listItems(int userId) {
+		String[] whereArgs = new String[] { String.valueOf(userId) };
+		Cursor c = db.query(TABLE_NAME, null, BY_USERID, whereArgs, null, null, null);
 
-		Cursor c = db.query("item_table", null, "userid=?",
-				new String[] { userId }, null, null, null);
-
-		List<ItemBean> res = new ArrayList<ItemBean>();
-
-		for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-			ItemBean tmp = new ItemBean();
-			tmp.setId(c.getLong(c.getColumnIndex("id")));
-			tmp.setUserId(userId);
-			tmp.setName(c.getString(c.getColumnIndex("name")));
-			tmp.setPrice(c.getDouble(c.getColumnIndex("price")));
-			tmp.setOut(c.getInt(c.getColumnIndex("isout")) == 1);
-			tmp.setClassify(c.getInt(c.getColumnIndex("classify")));
-			tmp.setTime(c.getString(c.getColumnIndex("time")));
-			res.add(tmp);
-		}
-		return res;
+		return parseMultipleItems(c);
 	}
 
 	/**
-	 * 查询某时间段内的item列表
+	 * 查询某时间段内发生的item列表
 	 * 
-	 * @param userId
-	 * @param fromDatetime
-	 * @param toDatetime
+	 * @param userId 用户id
+	 * @param fromDateTime 起始时间
+	 * @param toDateTime 终止时间
 	 */
-	public List<ItemBean> listItemsByTime(String userId, String fromDatetime,
-			String toDatetime) {
+	public List<Item> listItemsByOccurredTime(int userId, String fromDateTime, String toDateTime) {
+		String[] whereArgs = new String[] { String.valueOf(userId), fromDateTime, toDateTime };
+		Cursor c = db
+				.query(TABLE_NAME, null,
+						BY_USERID + " and datetime(occurredTime)>=datetime(?) and datetime(occurredTime)<=datetime(?)",
+						whereArgs, null, null, "datetime(occurredTime)");
 
-		Cursor c = db.query("item_table", null,
-				"userid=? and date(time)>=date(?) and date(time)<=date(?)", new String[] { userId,
-						fromDatetime, toDatetime}, null, null, "date(time)");
+		return parseMultipleItems(c);
+	}
+	
+	/**
+	 * 查询某时间段内修改的item列表
+	 * 
+	 * @param userId 用户id
+	 * @param fromDateTime 起始时间
+	 * @param toDateTime 终止时间
+	 */
+	public List<Item> listItemsByModifiedTime(int userId, String fromDateTime, String toDateTime) {
+		String[] whereArgs = new String[] { String.valueOf(userId), fromDateTime, toDateTime };
+		Cursor c = db
+				.query(TABLE_NAME, null,
+						BY_USERID + " and datetime(modifiedTime)>=datetime(?) and datetime(modifiedTime)<=datetime(?)",
+						whereArgs, null, null, "datetime(modifiedTime)");
 
-		List<ItemBean> res = new ArrayList<ItemBean>();
-
-		for (c.moveToFirst(); !c.isAfterLast(); c.moveToNext()) {
-			ItemBean tmp = new ItemBean();
-			tmp.setId(c.getLong(c.getColumnIndex("id")));
-			tmp.setUserId(userId);
-			tmp.setName(c.getString(c.getColumnIndex("name")));
-			tmp.setPrice(c.getDouble(c.getColumnIndex("price")));
-			tmp.setOut(c.getInt(c.getColumnIndex("isout")) == 1);
-			tmp.setClassify(c.getInt(c.getColumnIndex("classify")));
-			tmp.setTime(c.getString(c.getColumnIndex("time")));
-			res.add(tmp);
-		}
-		return res;
+		return parseMultipleItems(c);
 	}
 
 	/**
-	 * 查询单条任务纪录
+	 * 根据itemId查询单条记录，找不到则返回null
+	 * @param itemId item id
+	 * @return 对应的单条记录，找不到则返回null
 	 */
-	public ItemBean selectItem(int id) {
-		ItemBean res = null;
-		Cursor c = db.query("item_table", null, "id=?",
-				new String[] { Integer.toString(id) }, null, null, null);
+	public Item selectItem(int itemId) {
+		String[] whereArgs = new String[] { String.valueOf(itemId) };
+		Cursor c = db.query(TABLE_NAME, null, BY_ITEMID, whereArgs, null, null, null);
 
-		if (c.moveToFirst()) { // 是否为空
-			res = new ItemBean();
-			res.setId(id);
-			res.setUserId(c.getString(c.getColumnIndex("userid")));
-			res.setName(c.getString(c.getColumnIndex("name")));
-			res.setPrice(c.getDouble(c.getColumnIndex("price")));
-			res.setOut(c.getInt(c.getColumnIndex("isout")) == 1);
-			res.setClassify(c.getInt(c.getColumnIndex("classify")));
-			res.setTime(c.getString(c.getColumnIndex("time")));
-		}
-		return res;
+		return parseSingleItem(c);
 	}
 
 	/**
-	 * 更新
+	 * 
 	 */
-	public void updateItem(int id, ItemBean item) {
+	public void updateItem(Item item) {
+		String[] whereArgs = { String.valueOf(item.getItemId()) };
+		db.update(TABLE_NAME, parseToCV(item), BY_ITEMID, whereArgs);
+	}
+
+	private ContentValues parseToCV(Item item) {
 		ContentValues cv = new ContentValues();
+		
+		cv.put("itemId", item.getItemId());
 		cv.put("userid", item.getUserId());
 		cv.put("name", item.getName());
 		cv.put("price", item.getPrice());
-		cv.put("isout", item.isOut());
+		cv.put("isout", item.getIsOut());
 		cv.put("classify", item.getClassify());
-		cv.put("time", item.getTime());
+		cv.put("occurredTime", DATETIME_FORMAT.format(item.getOccurredTime()));
+		cv.put("modifiedTime", DATETIME_FORMAT.format(new Date()));
+		
+		return cv;
+	}
+	
+	private List<Item> parseMultipleItems(Cursor c) {
+		List<Item> res = new LinkedList<Item>();
+		Item tempItem;
+		while (!c.isAfterLast()) {
+			tempItem = parseSingleItem(c);
+			if (tempItem != null)
+				res.add(tempItem);
+		}
+		return res;
+	}
 
-		String whereClause = "id=?";
-		String[] whereArgs = { Integer.toString(id) };
-
-		db.update("item_table", cv, whereClause, whereArgs);
+	private Item parseSingleItem(Cursor c) {
+		Item res = null;
+		if (c.moveToNext()) {
+			res = new Item();
+			try {
+				res.setItemId(c.getInt(c.getColumnIndex("itemId")));
+				res.setUserId(c.getInt(c.getColumnIndex("userId")));
+				res.setName(c.getString(c.getColumnIndex("name")));
+				res.setPrice(c.getDouble(c.getColumnIndex("price")));
+				res.setIsOut(c.getInt(c.getColumnIndex("isout")) == 1);
+				res.setClassify(c.getInt(c.getColumnIndex("classify")));
+				String tempStr = c.getString(c.getColumnIndex("occurredTime"));
+				res.setOccurredTime((Date) Constant.DATETIME_FORMAT.parse(tempStr));
+				tempStr = c.getString(c.getColumnIndex("modifiedTime"));
+				res.setModifiedTime((Date) Constant.DATETIME_FORMAT.parse(tempStr));
+			} catch (ParseException e) {
+				Log.e("JJB",
+						"Malformatted record in database, abandoning the record...");
+				res = null;
+			}
+		}
+		return res;
 	}
 
 	/*

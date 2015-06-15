@@ -1,17 +1,21 @@
 package com.jjb.activity;
 
+import static com.jjb.util.Constant.*;
+
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import com.jjb.R;
 import com.jjb.util.DBManager;
-import com.jjb.util.ItemBean;
+import com.jjb.util.Item;
 
 import android.app.ActionBar.LayoutParams;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -34,7 +38,7 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
 	private EditText item;
 	private EditText price;
 	private RadioGroup radio;
@@ -48,8 +52,8 @@ public class MainActivity extends Activity {
 
 	boolean isOut = true;
 	int itemType = 0;
-	String itemDate = new String("");
-	
+	Date itemDate;
+
 	DBManager db;
 
 	@Override
@@ -59,7 +63,7 @@ public class MainActivity extends Activity {
 
 		// initial db manager
 		db = new DBManager(this);
-		
+
 		// initial
 		item = (EditText) findViewById(R.id.editText1);
 		price = (EditText) findViewById(R.id.editText2);
@@ -91,7 +95,8 @@ public class MainActivity extends Activity {
 				itemType = arg2;
 			}
 
-			public void onNothingSelected(AdapterView<?> arg0) {}
+			public void onNothingSelected(AdapterView<?> arg0) {
+			}
 		});
 		type.setOnTouchListener(new OnTouchListener() {
 			@Override
@@ -101,20 +106,25 @@ public class MainActivity extends Activity {
 		});
 
 		// set date picker
-		Calendar calendar=Calendar.getInstance();
-        int year=calendar.get(Calendar.YEAR);
-        int monthOfYear=calendar.get(Calendar.MONTH);
-        int dayOfMonth=calendar.get(Calendar.DAY_OF_MONTH);
-        itemDate = ""+year;
-		itemDate += "-"+(monthOfYear>9?monthOfYear:("0"+(monthOfYear+1)));
-		itemDate += "-"+(dayOfMonth>9?dayOfMonth:("0"+dayOfMonth));
-		date.init(year, monthOfYear, dayOfMonth, new OnDateChangedListener() {
-			public void onDateChanged(DatePicker view, int year,
-					int monthOfYear, int dayOfMonth) {
+		Calendar now = Calendar.getInstance();
+		itemDate = now.getTime();
+		date.init(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH),
+				new OnDateChangedListener() {
+			public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+				String temp;
 				// monthOfYear + 1
-				itemDate = ""+year;
-				itemDate += "-"+(monthOfYear>9?monthOfYear:("0"+(monthOfYear+1)));
-				itemDate += "-"+(dayOfMonth>9?dayOfMonth:("0"+dayOfMonth));
+				temp = "" + year;
+				temp += "-"
+						+ (monthOfYear > 9 ? monthOfYear
+								: ("0" + (monthOfYear + 1)));
+				temp += "-"
+						+ (dayOfMonth > 9 ? dayOfMonth : ("0" + dayOfMonth));
+				
+				try {
+					itemDate = DATETIME_FORMAT.parse(temp);
+				} catch (ParseException e) {
+					Log.e("JJB", "ParseException occurred in DatePicker");
+				}
 			}
 		});
 
@@ -141,16 +151,16 @@ public class MainActivity extends Activity {
 				String itemName = item.getText().toString();
 				double itemPrice = Double.parseDouble(price.getText()
 						.toString());
-				db.addItem(new ItemBean("abc", itemName, itemPrice, isOut, itemType, itemDate));
-				Intent intent = new Intent(MainActivity.this, SelectActivity.class);
+				db.addItem(new Item(USER_ID, itemName, itemPrice, isOut,
+						itemType, itemDate));
+				Intent intent = new Intent(MainActivity.this,
+						SelectActivity.class);
 				startActivity(intent);
 			}
 
 		});
-		
+
 	}
-	
-	
 
 	/**
 	 * 调整FrameLayout大小
