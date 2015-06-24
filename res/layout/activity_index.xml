@@ -33,13 +33,14 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="9"
-            android:text="添加记录" />
+            android:text="添加记录(语音)" />
 
         <Button
             android:id="@+id/addTextRecord"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:text="添加记录"/>
     </LinearLayout>
 
 </LinearLayout>
