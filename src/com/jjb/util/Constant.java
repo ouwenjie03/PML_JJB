@@ -13,7 +13,8 @@ public class Constant {
 	public static String ACCESS_KEY = "";
 	
 	// 服务器相关常量
-	public static final String HOST_NAME = "http://192.168.0.1:8080/";
+	//public static final String HOST_NAME = "http://192.168.0.1:8080/";
+	public static final String HOST_NAME = "http://localhost:8080/";
 	
 	// 数据库相关常量
 	public static final String TABLE_NAME = "item";

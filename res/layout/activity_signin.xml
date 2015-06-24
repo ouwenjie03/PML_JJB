@@ -3,60 +3,72 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="100dp"
         android:gravity="center"
+        android:paddingTop="100dp"
         android:text="这里是登陆页面"
         android:textSize="30sp" />
-    
-    <LinearLayout 
-       	android:layout_width="match_parent"
-       	android:layout_height="wrap_content"
-       	android:orientation="horizontal" >
-        
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="用户名：" />
-        
-        <EditText 
+
+        <EditText
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="6"
             android:inputType="text" />
-        
     </LinearLayout>
-    
-    <LinearLayout 
-       	android:layout_width="match_parent"
-       	android:layout_height="wrap_content"
-       	android:orientation="horizontal" >
-        
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="密码：" />
-        
-        <EditText 
+
+        <EditText
             android:id="@+id/password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:layout_weight="6" />
-        
+            android:layout_weight="6"
+            android:inputType="textPassword" />
     </LinearLayout>
-    
-    <Button android:id="@+id/confirm"
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:padding="30dp"
-        android:text="确定" />
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="30dp"
+            android:text="确定" />
+
+        <Button
+            android:id="@+id/signup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="30dp"
+            android:text="注册" />
+    </LinearLayout>
 
 </LinearLayout>
