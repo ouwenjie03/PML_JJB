@@ -15,7 +15,7 @@ public class SignInActivity extends BaseActivity {
 	private TextView userNameView;
 	private TextView passwordView;
 
-	private String userName;
+	private String username;
 	private String password;
 
 	@Override
@@ -29,18 +29,18 @@ public class SignInActivity extends BaseActivity {
 		findViewById(R.id.confirm).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				userName = userNameView.getText().toString();
+				username = userNameView.getText().toString();
 				password = passwordView.getText().toString();
 
-				Log.e("Signin userName", userName);
+				Log.e("Signin userName", username);
 				Log.e("Signin userPassword", password);
 
-				if (userName.isEmpty() || password.isEmpty()) {
+				if (username.isEmpty()|| password.isEmpty()) {
 					Debugger.DisplayToast(SignInActivity.this, "上述信息不能为空");
 					return;
 				}
 
-				new SignInTask(SignInActivity.this).execute(userName, password);
+				new SignInTask(SignInActivity.this).execute(username, password);
 			}
 		});
 
