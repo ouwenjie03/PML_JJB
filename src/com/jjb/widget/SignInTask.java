@@ -3,10 +3,12 @@ package com.jjb.widget;
 import static com.jjb.util.Constant.*;
 
 import java.net.SocketTimeoutException;
+import java.security.MessageDigest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.jjb.activity.IndexActivity;
 import com.jjb.activity.MainActivity;
 import com.jjb.util.Communicator;
 import com.jjb.util.Constant;
@@ -33,6 +35,35 @@ public class SignInTask extends AsyncTask<String, Void, String> {
 		this.context = context;
 	}
 	
+	protected String encoderByMd5(String str) {
+		MessageDigest md5 = null;
+		try {
+			md5 = MessageDigest.getInstance("MD5");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		}
+		 
+		char[] charArray = str.toCharArray();
+		byte[] byteArray = new byte[charArray.length];
+		 
+		for (int i = 0; i < charArray.length; i++) {
+			byteArray[i] = (byte) charArray[i];
+		}
+		byte[] md5Bytes = md5.digest(byteArray);
+		 
+		StringBuffer hexValue = new StringBuffer();
+		for (int i = 0; i < md5Bytes.length; i++) {
+			int val = ((int) md5Bytes[i]) & 0xff;
+			if (val < 16) {
+				hexValue.append("0");
+			}
+			hexValue.append(Integer.toHexString(val));
+		}
+		return hexValue.toString();
+	}
+
+	
 	@Override
 	protected String doInBackground(String... params) {
 		String userID = null;
@@ -41,7 +72,7 @@ public class SignInTask extends AsyncTask<String, Void, String> {
 			return userID;
 		try {
 			result =
-					Communicator.sendPost(targetMethod, "?username=" + params[0] + "&password=" + params[1]);
+					Communicator.sendPost(targetMethod, "username=" + params[0] + "&password=" + encoderByMd5(params[1]));
 			JSONObject response = new JSONObject(result);
 			accessKey = response.getString("accessKey");
 			expiresTime = response.getString("expiresTime");
@@ -66,7 +97,10 @@ public class SignInTask extends AsyncTask<String, Void, String> {
 			editor.putInt(PREF_USERID, userId);
 			editor.commit();
 			
-			Intent intent = new Intent(context, MainActivity.class);
+			Constant.USER_ID = userId;
+			Constant.ACCESS_KEY = accessKey;
+			
+			Intent intent = new Intent(context,IndexActivity.class);
 			context.startActivity(intent);
 		} else {
 			Debugger.DisplayToast(context, userID);
