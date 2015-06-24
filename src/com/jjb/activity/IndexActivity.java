@@ -33,8 +33,7 @@ import android.widget.Button;
  * @author Robert Peng
  */
 public class IndexActivity extends BaseActivity {
-	private SharedPreferences preferences = getSharedPreferences(Constant.PREF_USER_INFO, MODE_PRIVATE);
-	
+	private SharedPreferences preferences = null;
 	private BaiduASRDigitalDialog mDialog = null;
 	private DialogRecognitionListener mRecognitionListener;
 	
@@ -43,6 +42,9 @@ public class IndexActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_index);
+		
+		preferences = getSharedPreferences(Constant.PREF_USER_INFO, MODE_PRIVATE);
+		
 		
 		final Button recordButton = (Button) findViewById(R.id.addRecord);
 		final Button textButton = (Button) findViewById(R.id.addTextRecord);
@@ -129,9 +131,9 @@ public class IndexActivity extends BaseActivity {
 				JSONObject response = null;
 				JSONArray resultArr = new JSONArray();
 				try {
-					rawResponse = Communicator.sendGet("sync?userId="
+					rawResponse = Communicator.sendPost("syncFromServer", "userId="
 							+ Constant.USER_ID + "&accessKey=" + Constant.ACCESS_KEY
-							+ "&fromDateTime=" + lastSync);
+							+ "&fromDateTime=" + (lastSync == null ? "" : lastSync));
 					response = new JSONObject(rawResponse);
 					resultArr = response.getJSONArray("items");
 				} catch (SocketTimeoutException e) {
@@ -156,6 +158,9 @@ public class IndexActivity extends BaseActivity {
 						iteratePointer.setOccurredTime(Constant.DATETIME_FORMAT.parse(currentObject.getString("occurredTime")));
 						iteratePointer.setModifiedTime(Constant.DATETIME_FORMAT.parse(currentObject.getString("modifiedTime")));
 						
+						if (lastSync == null  || iteratePointer.getModifiedTime().after(Constant.DATETIME_FORMAT.parse(lastSync)))
+							lastSync = Constant.DATETIME_FORMAT.format(iteratePointer.getModifiedTime());
+						
 						long result = db.addItem(iteratePointer);
 						if (result == -1) { // error occurred when inserting, (probably results from duplicate id), try update
 							db.updateItem(iteratePointer);
@@ -169,7 +174,7 @@ public class IndexActivity extends BaseActivity {
 				// 向服务器上传自lastSync以后更新过的本地数据
 				List<Item> itemsInDB =
 						db.listItemsByModifiedTime(Constant.USER_ID, lastSync, Constant.DATETIME_FORMAT.format(new Date()));
-				
+				resultArr = new JSONArray();
 				for (Item item : itemsInDB) {
 					try {
 						currentObject = new JSONObject();
@@ -192,7 +197,7 @@ public class IndexActivity extends BaseActivity {
 					// 发送到服务器
 					rawResponse = null;
 					try {
-						rawResponse = Communicator.sendPost("sync", "?items=" + resultArr.toString() + "&userId=" + Constant.USER_ID + "&accessKey=" + Constant.ACCESS_KEY);
+						rawResponse = Communicator.sendPost("syncToServer", "items=" + resultArr.toString() + "&userId=" + Constant.USER_ID + "&accessKey=" + Constant.ACCESS_KEY);
 					} catch (SocketTimeoutException e) {
 						Log.e("JJB", "Socket timeouted when try to upload items");
 						return null;
