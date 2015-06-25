@@ -8,10 +8,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONObject;
+
 import com.jjb.R;
 import com.jjb.util.DBManager;
 import com.jjb.util.Item;
 
+import android.R.integer;
 import android.app.ActionBar.LayoutParams;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,6 +40,7 @@ import android.widget.RadioGroup;
 import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 public class MainActivity extends BaseActivity {
 	private EditText item;
@@ -61,9 +65,6 @@ public class MainActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		// initial db manager
-		db = new DBManager(this);
-
 		// initial
 		item = (EditText) findViewById(R.id.editText1);
 		price = (EditText) findViewById(R.id.editText2);
@@ -75,6 +76,70 @@ public class MainActivity extends BaseActivity {
 		time = (TimePicker) findViewById(R.id.timePicker1);
 		ok = (Button) findViewById(R.id.ok);
 		select = (Button) findViewById(R.id.select);
+
+		// initial db manager
+		db = new DBManager(this);
+
+		Bundle extras = getIntent() == null ? null : getIntent().getExtras();
+		if (extras != null) {
+			ArrayList<String> resultList = getIntent().getExtras()
+					.getStringArrayList("resultList");
+			StringBuilder sb = new StringBuilder();
+			JSONObject jsonObject = null;
+			String itemName = null;
+			try {
+				jsonObject = new JSONObject(resultList.get(0));
+				jsonObject = new JSONObject(jsonObject.getString("json_res"));
+				itemName = jsonObject.getString("parsed_text");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			String[] words = null;
+			if (itemName != null) {
+				words = itemName.split(" ");
+			}
+			int size = words.length;
+			int index = 0;
+			for (int i = 0; i < size; ++i) {
+				if (words[i].matches("[十九八七六五四三二一万千百零块元毛角0-9]+")) {
+					index= i;
+					break;
+				}
+			}
+			String tmp = "";
+			for (int i = 0; i < index; ++i)
+				tmp += words[i];
+			item.setText(tmp);
+			tmp = words[index];
+			for (int i = index+1; i < size; ++i) {
+				if (words[i].matches("[块点]") && i +1 < size) {
+				    tmp += ".";
+				    for (int j = i + 1; j < size; ++j) {
+				    	if (words[j].matches("[一]")) {
+				    		tmp += "1";
+				    	} else if (words[j].matches("[二]")) {
+				    		tmp += "2";
+				    	} else if (words[j].matches("[三]")) {
+				    		tmp += "3";
+				    	} else if (words[j].matches( "[四]")) {
+				    		tmp += "4";
+				    	} else if (words[j].matches( "[五]")) {
+				    		tmp += "5";
+				    	} else if (words[j].matches( "[六]")) {
+				    		tmp += "6";
+				    	} else if (words[j].matches("[七]")) {
+				    		tmp += "7";
+				    	} else if (words[j].matches("[八]")) {
+				    		tmp += "8";
+				    	} else if (words[j].matches("[九]")) {
+				    		tmp += "9";
+				    	}
+				    }
+				    break;
+				}
+			}
+			price.setText(tmp);
+		}
 
 		time.setIs24HourView(true);
 		resizePikcer(date);// 调整datepicker大小
@@ -109,25 +174,29 @@ public class MainActivity extends BaseActivity {
 		// set date picker
 		Calendar now = Calendar.getInstance();
 		itemDate = now.getTime();
-		date.init(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH),
-				new OnDateChangedListener() {
-			public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-				String temp;
-				// monthOfYear + 1
-				temp = "" + year;
-				temp += "-"
-						+ (monthOfYear > 9 ? monthOfYear
-								: ("0" + (monthOfYear + 1)));
-				temp += "-"
-						+ (dayOfMonth > 9 ? dayOfMonth : ("0" + dayOfMonth));
-				
-				try {
-					itemDate = DATETIME_FORMAT.parse(temp);
-				} catch (ParseException e) {
-					Log.e("JJB", "ParseException occurred in DatePicker");
-				}
-			}
-		});
+		date.init(now.get(Calendar.YEAR), now.get(Calendar.MONTH),
+				now.get(Calendar.DAY_OF_MONTH), new OnDateChangedListener() {
+					public void onDateChanged(DatePicker view, int year,
+							int monthOfYear, int dayOfMonth) {
+						String temp;
+						// monthOfYear + 1
+						temp = "" + year;
+						temp += "-"
+								+ (monthOfYear > 9 ? monthOfYear
+										: ("0" + (monthOfYear + 1)));
+						temp += "-"
+								+ (dayOfMonth > 9 ? dayOfMonth
+										: ("0" + dayOfMonth));
+
+						try {
+							Log.e("date", temp);
+							itemDate = DATE_FORMAT.parse(temp);
+						} catch (ParseException e) {
+							Log.e("JJB",
+									"ParseException occurred in DatePicker");
+						}
+					}
+				});
 
 		// set radio group
 		radio.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -154,9 +223,8 @@ public class MainActivity extends BaseActivity {
 						.toString());
 				db.addItem(new Item(USER_ID, itemName, itemPrice, isOut,
 						itemType, itemDate));
-				Intent intent = new Intent(MainActivity.this,
-						SelectActivity.class);
-				startActivity(intent);
+				Toast.makeText(getApplicationContext(), "新建成功",
+					     Toast.LENGTH_SHORT).show();
 			}
 
 		});
@@ -165,11 +233,11 @@ public class MainActivity extends BaseActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				Intent intent = new Intent(MainActivity.this,
-						SelectActivity.class);
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(MainActivity.this, SelectActivity.class);
 				startActivity(intent);
 			}
-
+			
 		});
 
 	}

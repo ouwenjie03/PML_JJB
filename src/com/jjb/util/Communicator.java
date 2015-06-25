@@ -60,7 +60,7 @@ public class Communicator {
 		InputStreamReader in = null;
 		try {
 			url = new URL("http://" + HOST_NAME + method);
-			Log.e("post url", "http://" + HOST_NAME + method + content);
+			Log.e("post url", "http://" + HOST_NAME + method  +"?"+ content);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setDoInput(true);
 			connection.setDoOutput(true);

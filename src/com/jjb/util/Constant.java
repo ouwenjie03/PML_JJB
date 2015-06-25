@@ -13,15 +13,15 @@ public class Constant {
 	public static String ACCESS_KEY = "";
 	
 	// 服务器相关常量
-	//public static final String HOST_NAME = "http://192.168.0.1:8080/";
-	public static final String HOST_NAME = "http://localhost:8080/";
+	//public static final String HOST_NAME = "172.18.35.91:8080/JJB_Server/";
+	public static final String HOST_NAME = "120.25.163.80:8080/JJB_Server/";
 	
 	// 数据库相关常量
 	public static final String TABLE_NAME = "item";
 	
 	// DateFormat相关常量
 	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-	public static final SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	public static final SimpleDateFormat DATETIME_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public static final SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
 	public static final SimpleDateFormat MONTH_FORMAT = new SimpleDateFormat("MM");
 	public static final SimpleDateFormat DAY_FORMAT = new SimpleDateFormat("dd");
