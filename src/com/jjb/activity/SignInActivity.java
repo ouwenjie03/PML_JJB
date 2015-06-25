@@ -35,7 +35,7 @@ public class SignInActivity extends BaseActivity {
 				Log.e("Signin userName", username);
 				Log.e("Signin userPassword", password);
 
-				if (username.isEmpty()|| password.isEmpty()) {
+				if (username.equals("") || password.equals("")) {
 					Debugger.DisplayToast(SignInActivity.this, "上述信息不能为空");
 					return;
 				}
@@ -47,8 +47,7 @@ public class SignInActivity extends BaseActivity {
 		findViewById(R.id.signup).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(SignInActivity.this,
-						SignUpActivity.class);
+				Intent intent = new Intent(SignInActivity.this, SignUpActivity.class);
 				startActivity(intent);
 			}
 		});
