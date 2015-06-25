@@ -45,11 +45,11 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.jjb.activity.SelectActivity"
+            android:name="com.jjb.activity.XYChartActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.jjb.activity.XYChartActivity"
+            android:name="com.jjb.activity.SelectActivity"
             android:label="@string/app_name" >
         </activity>
     </application>

@@ -1,6 +1,7 @@
 package com.jjb.activity;
 
 import java.net.SocketTimeoutException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -147,7 +148,7 @@ public class IndexActivity extends BaseActivity {
 				for (int i = 0; resultArr != null && i < resultArr.length(); i++) {
 					
 					try {
-						currentObject = resultArr.getJSONObject(i);
+						currentObject = new JSONObject(resultArr.getString(i));
 						iteratePointer = new Item();
 						iteratePointer.setItemId(currentObject.getInt("itemId"));
 						iteratePointer.setUserId(currentObject.getInt("userId"));
@@ -165,9 +166,19 @@ public class IndexActivity extends BaseActivity {
 						if (result == -1) { // error occurred when inserting, (probably results from duplicate id), try update
 							db.updateItem(iteratePointer);
 						}
-					} catch (Exception e) {
+					} catch (JSONException e) {
 						Log.e("JJB", "Malfromed record in server response: index " + i + ", auto skipping.");
+						Log.e("JJB", "Failed to parse the JSON Response from server");
 						Log.e("JJB", "    server response is: " + rawResponse);
+						e.printStackTrace();
+					} catch (ParseException e) {
+						Log.e("JJB", "Malfromed record in server response: index " + i + ", auto skipping.");
+						Log.e("JJB", "Failed to parse the DateTime from server");
+						Log.e("JJB", "    server response is: " + rawResponse);
+						e.printStackTrace();
+					} catch (Exception e) {
+						Log.e("JJB", "Failed to sync from server due to unknown error.");
+						e.printStackTrace();
 					}
 				}
 				

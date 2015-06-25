@@ -49,11 +49,9 @@ public class XYChartActivity extends Activity implements ViewPager.OnPageChangeL
 	/** Colors to be used for the pie slices. */
 	private static int[] COLORS = new int[] { Color.GREEN, Color.BLUE, Color.MAGENTA, Color.CYAN };
 	/** The main series that will include all the data. */
-	private CategorySeries mSeries1 = new CategorySeries("");
-	private CategorySeries mSeries2 = new CategorySeries("");
+	private CategorySeries mSeries = new CategorySeries("");
 	/** The main renderer for the main dataset. */
-	private DefaultRenderer mPieRenderer1 = new DefaultRenderer();
-	private DefaultRenderer mPieRenderer2 = new DefaultRenderer();
+	private DefaultRenderer mPieRenderer = new DefaultRenderer();
 
 	/**
 	 * ViewPager
@@ -66,7 +64,7 @@ public class XYChartActivity extends Activity implements ViewPager.OnPageChangeL
 	/**
 	 * 装ImageView数组
 	 */
-	private GraphicalView[] mGraphicalViews = new GraphicalView[3];
+	private GraphicalView[] mGraphicalViews = new GraphicalView[2];
 	
 	private String[] month2Str = {"Jan","Feb","Mar",
 			"Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
@@ -80,10 +78,8 @@ public class XYChartActivity extends Activity implements ViewPager.OnPageChangeL
 	  outState.putSerializable("current_series", mCurrentSeries);
 	  outState.putSerializable("current_renderer", mCurrentRenderer);
 
-		outState.putSerializable("current_series1", mSeries1);
-		outState.putSerializable("current_series2", mSeries2);
-		outState.putSerializable("current_renderer1", mPieRenderer1);
-		outState.putSerializable("current_renderer2", mPieRenderer2);
+		outState.putSerializable("current_series", mSeries);
+		outState.putSerializable("current_renderer", mPieRenderer);
 	}
 	  
 	@Override
@@ -96,10 +92,8 @@ public class XYChartActivity extends Activity implements ViewPager.OnPageChangeL
 	  mCurrentSeries = (XYSeries) savedState.getSerializable("current_series");
 	  mCurrentRenderer = (XYSeriesRenderer) savedState.getSerializable("current_renderer");
 
-		mSeries1 = (CategorySeries) savedState.getSerializable("current_series1");
-		mSeries2 = (CategorySeries) savedState.getSerializable("current_series2");
-		mPieRenderer1 = (DefaultRenderer) savedState.getSerializable("current_renderer1");
-		mPieRenderer2 = (DefaultRenderer) savedState.getSerializable("current_renderer2");
+		mSeries = (CategorySeries) savedState.getSerializable("current_series");
+		mPieRenderer = (DefaultRenderer) savedState.getSerializable("current_renderer");
 	}
 
 	@Override
@@ -111,7 +105,7 @@ public class XYChartActivity extends Activity implements ViewPager.OnPageChangeL
 		ViewGroup group = (ViewGroup)findViewById(R.id.viewGroup);
 		viewPager = (ViewPager) findViewById(R.id.viewPager);
 		//将点点加入到ViewGroup中
-		tips = new ImageView[3];
+		tips = new ImageView[2];
 		for(int i=0; i<tips.length; i++) {
 			ImageView imageView = new ImageView(this);
 			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(20, 20);
@@ -156,7 +150,7 @@ public class XYChartActivity extends Activity implements ViewPager.OnPageChangeL
           mXYRenderer.addSeriesRenderer(renderer);
         }
 
-		mXYRenderer.setChartTitle("收支趋势统计图");
+		mXYRenderer.setChartTitle("daily income and spending");
 		mXYRenderer.setXTitle("\nDate");
 		mXYRenderer.setYTitle("money");
 		mXYRenderer.setAxesColor(Color.LTGRAY);
@@ -192,7 +186,7 @@ public class XYChartActivity extends Activity implements ViewPager.OnPageChangeL
 			String[] f = thisDate.trim().split(reg);
 	        calendar.set(Integer.parseInt (f[0]), Integer.parseInt (f[1]) - 1, Integer.parseInt (f[2]));
 	        long fd2 = calendar.getTime().getTime();
-			int index = Integer.parseInt("" + (fd2 - fd1) / 1000000);
+			int index = Integer.parseInt("" + (fd2 - fd1) / 100000000);
 			
 			allSpendingPrice[i] = allMyDoublesOut.get(i).count;
 			allSpendingKeys[i] = index;
@@ -242,90 +236,46 @@ public class XYChartActivity extends Activity implements ViewPager.OnPageChangeL
 
 		//mChartView.repaint();
 
-		//支出饼图
-		String nameOut[] = {"clothesOut","dietOut","shelterOut","activityOut"};
-		String chineseNameOut[] = {"衣","食","住","行"};
-		double priceOut[] = new double[4];
+		//饼图
+		String name[] = {"clothes","diet","shelter","activity"};
+		String chineseName[] = {"衣","食","住","行"};
+		double price[] = new double[4];
 		for (int i = 0;i < 4;i++)
 		{
-			priceOut[i] = bundle.getDouble(nameOut[i]);
+			price[i] = bundle.getDouble(name[i]);
 			//自己编的数据
 			//price[i] = i * i + 3 * i + 10;
 
-			mSeries1.add(chineseNameOut[i], priceOut[i]);
+			mSeries.add(chineseName[i], price[i]);
 			SimpleSeriesRenderer renderer = new SimpleSeriesRenderer();
-			renderer.setColor(COLORS[(mSeries1.getItemCount() - 1) % COLORS.length]);
-			mPieRenderer1.addSeriesRenderer(renderer);
+			renderer.setColor(COLORS[(mSeries.getItemCount() - 1) % COLORS.length]);
+			mPieRenderer.addSeriesRenderer(renderer);
 		}
 
-		mPieRenderer1.setZoomButtonsVisible(true);
-		mPieRenderer1.setStartAngle(180);
-		mPieRenderer1.setDisplayValues(true);
-		mPieRenderer1.setChartTitleTextSize(30);
-		mPieRenderer1.setChartTitle("支出分类统计图");
-		mPieRenderer1.setAxesColor(Color.RED);
-		mPieRenderer1.setLegendTextSize(30);
-		mPieRenderer1.setLabelsColor(Color.BLACK);
-		mPieRenderer1.setLabelsTextSize(30);
+		mPieRenderer.setZoomButtonsVisible(true);
+		mPieRenderer.setStartAngle(180);
+		mPieRenderer.setDisplayValues(true);
+		mPieRenderer.setChartTitleTextSize(30);
+		mPieRenderer.setChartTitle("分类饼图");
+		mPieRenderer.setAxesColor(Color.RED);
+		mPieRenderer.setLegendTextSize(30);
+		mPieRenderer.setLabelsColor(Color.BLACK);
+		mPieRenderer.setLabelsTextSize(30);
 		//mPieRenderer.setExternalZoomEnabled(false);
 		//mPieRenderer.setFitLegend(false);
-		mPieRenderer1.setPanEnabled(false);
+		mPieRenderer.setPanEnabled(false);
 		//mPieRenderer.setFitLegend(false);
-		mPieRenderer1.setZoomButtonsVisible(true);
-		mPieRenderer1.setZoomEnabled(false);//放大缩小
+		mPieRenderer.setZoomButtonsVisible(true);
+		mPieRenderer.setZoomEnabled(false);//放大缩小
 		//mPieRenderer.setScale(2);
 		//mPieRenderer.setMargins(new int[]{0,0,0,10});
 
 
 		//LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
-		mChartView = ChartFactory.getPieChartView(this, mSeries1, mPieRenderer1);
+		mChartView = ChartFactory.getPieChartView(this, mSeries, mPieRenderer);
 		mChartView.setPadding(0,0,0,10);
 		//layout.addView(mChartView, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 		mGraphicalViews[1] = mChartView;
-
-		//mChartView.repaint();
-		
-		
-		//收入饼图
-		String nameIn[] = {"clothesIn","dietIn","shelterIn","activityIn"};
-		String chineseNameIn[] = {"衣","食","住","行"};
-		double priceIn[] = new double[4];
-		for (int i = 0;i < 4;i++)
-		{
-			priceIn[i] = bundle.getDouble(nameIn[i]);
-			//自己编的数据
-			//price[i] = i * i + 3 * i + 10;
-
-			mSeries2.add(chineseNameIn[i], priceIn[i]);
-			SimpleSeriesRenderer renderer = new SimpleSeriesRenderer();
-			renderer.setColor(COLORS[(mSeries2.getItemCount() - 1) % COLORS.length]);
-			mPieRenderer2.addSeriesRenderer(renderer);
-		}
-
-		mPieRenderer2.setZoomButtonsVisible(true);
-		mPieRenderer2.setStartAngle(180);
-		mPieRenderer2.setDisplayValues(true);
-		mPieRenderer2.setChartTitleTextSize(30);
-		mPieRenderer2.setChartTitle("收入分类统计图");
-		mPieRenderer2.setAxesColor(Color.RED);
-		mPieRenderer2.setLegendTextSize(30);
-		mPieRenderer2.setLabelsColor(Color.BLACK);
-		mPieRenderer2.setLabelsTextSize(30);
-		//mPieRenderer.setExternalZoomEnabled(false);
-		//mPieRenderer.setFitLegend(false);
-		mPieRenderer2.setPanEnabled(false);
-		//mPieRenderer.setFitLegend(false);
-		mPieRenderer2.setZoomButtonsVisible(true);
-		mPieRenderer2.setZoomEnabled(false);//放大缩小
-		//mPieRenderer.setScale(2);
-		//mPieRenderer.setMargins(new int[]{0,0,0,10});
-
-
-		//LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
-		mChartView = ChartFactory.getPieChartView(this, mSeries2, mPieRenderer2);
-		mChartView.setPadding(0,0,0,10);
-		//layout.addView(mChartView, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		mGraphicalViews[2] = mChartView;
 
 		//mChartView.repaint();
     }
@@ -359,8 +309,8 @@ public class XYChartActivity extends Activity implements ViewPager.OnPageChangeL
 	    	//layout.addView(mChartView, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
 				//LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
-				mChartView = ChartFactory.getPieChartView(this, mSeries1, mPieRenderer1);
-				mPieRenderer1.setClickEnabled(true);
+				mChartView = ChartFactory.getPieChartView(this, mSeries, mPieRenderer);
+				mPieRenderer.setClickEnabled(true);
 				mChartView.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
@@ -369,33 +319,8 @@ public class XYChartActivity extends Activity implements ViewPager.OnPageChangeL
 							Toast.makeText(XYChartActivity.this, "No chart element selected", Toast.LENGTH_SHORT)
 									.show();
 						} else {
-							for (int i = 0; i < mSeries1.getItemCount(); i++) {
-								mPieRenderer1.getSeriesRendererAt(i).setHighlighted(i == seriesSelection.getPointIndex());
-							}
-							mChartView.repaint();
-							Toast.makeText(
-									XYChartActivity.this,
-									"Chart data point index " + seriesSelection.getPointIndex() + " selected"
-											+ " point value=" + seriesSelection.getValue(), Toast.LENGTH_SHORT).show();
-						}
-					}
-				});
-				//layout.addView(mChartView, new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-				
-
-				//LinearLayout layout = (LinearLayout) findViewById(R.id.chart);
-				mChartView = ChartFactory.getPieChartView(this, mSeries2, mPieRenderer2);
-				mPieRenderer2.setClickEnabled(true);
-				mChartView.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						SeriesSelection seriesSelection = mChartView.getCurrentSeriesAndPoint();
-						if (seriesSelection == null) {
-							Toast.makeText(XYChartActivity.this, "No chart element selected", Toast.LENGTH_SHORT)
-									.show();
-						} else {
-							for (int i = 0; i < mSeries2.getItemCount(); i++) {
-								mPieRenderer2.getSeriesRendererAt(i).setHighlighted(i == seriesSelection.getPointIndex());
+							for (int i = 0; i < mSeries.getItemCount(); i++) {
+								mPieRenderer.getSeriesRendererAt(i).setHighlighted(i == seriesSelection.getPointIndex());
 							}
 							mChartView.repaint();
 							Toast.makeText(

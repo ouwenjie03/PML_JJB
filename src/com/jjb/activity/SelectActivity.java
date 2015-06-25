@@ -121,14 +121,10 @@ public class SelectActivity extends Activity {
 					// res += li.get(i).toString()+"\n";
 					// }
 					// tv.setText(res);
-					double clothesOut = 0.0;
-					double dietOut = 0.0;
-					double shelterOut = 0.0;
-					double activityOut = 0.0;
-					double clothesIn = 0.0;
-					double dietIn = 0.0;
-					double shelterIn = 0.0;
-					double activityIn = 0.0;
+					double clothes = 0.0;
+					double diet = 0.0;
+					double shelter = 0.0;
+					double activity = 0.0;
 
 					ArrayList<MyDouble> myDoublesOut = new ArrayList<MyDouble>();
 					ArrayList<MyDouble> myDoublesIn = new ArrayList<MyDouble>();
@@ -140,26 +136,14 @@ public class SelectActivity extends Activity {
 					boolean out = li.get(0).getIsOut();
 
 					for (int i = 0; i < li.size(); ++i) {
-						if (li.get(i).getIsOut()){
-							if (li.get(i).getClassify() == 0) {
-								clothesOut += li.get(i).getPrice();
-							} else if (li.get(i).getClassify() == 1) {
-								dietOut += li.get(i).getPrice();
-							} else if (li.get(i).getClassify() == 2) {
-								shelterOut += li.get(i).getPrice();
-							} else {
-								activityOut += li.get(i).getPrice();
-							}
-						} else{
-							if (li.get(i).getClassify() == 0) {
-								clothesIn += li.get(i).getPrice();
-							} else if (li.get(i).getClassify() == 1) {
-								dietIn += li.get(i).getPrice();
-							} else if (li.get(i).getClassify() == 2) {
-								shelterIn += li.get(i).getPrice();
-							} else {
-								activityIn += li.get(i).getPrice();
-							}
+						if (li.get(i).getClassify() == 0) {
+							clothes += li.get(i).getPrice();
+						} else if (li.get(i).getClassify() == 1) {
+							diet += li.get(i).getPrice();
+						} else if (li.get(i).getClassify() == 2) {
+							shelter += li.get(i).getPrice();
+						} else {
+							activity += li.get(i).getPrice();
 						}
 
 						if (Constant.DATE_FORMAT.format(
@@ -270,14 +254,10 @@ public class SelectActivity extends Activity {
 
 					Intent intent = new Intent(SelectActivity.this,
 							XYChartActivity.class);
-					intent.putExtra("clothesOut", clothesOut);
-					intent.putExtra("dietOut", dietOut);
-					intent.putExtra("shelterOut", shelterOut);
-					intent.putExtra("activityOut", activityOut);
-					intent.putExtra("clothesIn", clothesIn);
-					intent.putExtra("dietIn", dietIn);
-					intent.putExtra("shelterIn", shelterIn);
-					intent.putExtra("activityIn", activityIn);
+					intent.putExtra("clothes", clothes);
+					intent.putExtra("diet", diet);
+					intent.putExtra("shelter", shelter);
+					intent.putExtra("activity", activity);
 					intent.putExtra("allMyDoublesOut", allMyDoublesOut);
 					intent.putExtra("allMyDoublesIn", allMyDoublesIn);
 					intent.putExtra("allMyTimeStrings", allMyTimeStrings);
