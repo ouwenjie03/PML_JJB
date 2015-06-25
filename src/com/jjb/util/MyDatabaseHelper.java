@@ -21,7 +21,7 @@ public class MyDatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		Log.w("JJB", "create table!");
 		db.execSQL("CREATE TABLE `" + Constant.TABLE_NAME + "` ("
-				+ "`id` INTEGER PRIMARY KEY AUTOINCREMENT,"
+				+ "`itemid` INTEGER PRIMARY KEY AUTOINCREMENT,"
 				+ "`userid` INTEGER,"
 				+ "`name` NVARCHAR(255),"
 				+ "`price` DOUBLE,"

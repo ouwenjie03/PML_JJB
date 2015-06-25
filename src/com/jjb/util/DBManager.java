@@ -21,8 +21,8 @@ public class DBManager {
 	private MyDatabaseHelper helper;
 	private SQLiteDatabase db;
 	
-	private static String BY_USERID = "userId=?";
-	private static String BY_ITEMID = "itemId=?";
+	private static String BY_USERID = "userid=?";
+	private static String BY_ITEMID = "itemid=?";
 
 	public DBManager(Context context) {
 		helper = new MyDatabaseHelper(context, null); // 传入null使用默认factory初始化
@@ -69,8 +69,8 @@ public class DBManager {
 		String[] whereArgs = new String[] { String.valueOf(userId), fromDateTime, toDateTime };
 		Cursor c = db
 				.query(TABLE_NAME, null,
-						BY_USERID + " and datetime(occurredTime)>=datetime(?) and datetime(occurredTime)<=datetime(?)",
-						whereArgs, null, null, "datetime(occurredTime)");
+						BY_USERID + " and date(occurredTime)>=date(?) and date(occurredTime)<=date(?)",
+						whereArgs, null, null, "occurredTime");
 
 		return parseMultipleItems(c);
 	}
@@ -84,10 +84,16 @@ public class DBManager {
 	 */
 	public List<Item> listItemsByModifiedTime(int userId, String fromDateTime, String toDateTime) {
 		String[] whereArgs = new String[] { String.valueOf(userId), fromDateTime, toDateTime };
+		StringBuilder whereClause = new StringBuilder("userid=" + String.valueOf(userId));
+		if (fromDateTime != null) {
+			whereClause.append(" and datetime(modifiedTime)>=datetime(\"" + fromDateTime + "\")");
+		}
+		if (toDateTime != null) {
+			whereClause.append(" and datetime(modifiedTime)<=datetime(\"" + toDateTime + "\")");
+		}
 		Cursor c = db
 				.query(TABLE_NAME, null,
-						BY_USERID + " and datetime(modifiedTime)>=datetime(?) and datetime(modifiedTime)<=datetime(?)",
-						whereArgs, null, null, "datetime(modifiedTime)");
+						whereClause.toString(), null, null, null, "datetime(modifiedTime)");
 
 		return parseMultipleItems(c);
 	}
@@ -115,7 +121,7 @@ public class DBManager {
 	private ContentValues parseToCV(Item item) {
 		ContentValues cv = new ContentValues();
 		
-		cv.put("itemId", item.getItemId());
+		//cv.put("itemid", item.getItemId());
 		cv.put("userid", item.getUserId());
 		cv.put("name", item.getName());
 		cv.put("price", item.getPrice());
@@ -132,8 +138,10 @@ public class DBManager {
 		Item tempItem;
 		while (!c.isAfterLast()) {
 			tempItem = parseSingleItem(c);
-			if (tempItem != null)
+			if (tempItem != null) {
+				Log.e("item", tempItem.toString());
 				res.add(tempItem);
+			}
 		}
 		return res;
 	}
@@ -143,8 +151,8 @@ public class DBManager {
 		if (c.moveToNext()) {
 			res = new Item();
 			try {
-				res.setItemId(c.getInt(c.getColumnIndex("itemId")));
-				res.setUserId(c.getInt(c.getColumnIndex("userId")));
+				res.setItemId(c.getInt(c.getColumnIndex("itemid")));
+				res.setUserId(c.getInt(c.getColumnIndex("userid")));
 				res.setName(c.getString(c.getColumnIndex("name")));
 				res.setPrice(c.getDouble(c.getColumnIndex("price")));
 				res.setIsOut(c.getInt(c.getColumnIndex("isout")) == 1);
