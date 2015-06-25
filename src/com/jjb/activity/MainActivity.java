@@ -112,26 +112,26 @@ public class MainActivity extends BaseActivity {
 			item.setText(tmp);
 			tmp = words[index];
 			for (int i = index+1; i < size; ++i) {
-				if (words[i].matches("[块点]")) {
+				if (words[i].matches("[块点]") && i +1 < size) {
 				    tmp += ".";
 				    for (int j = i + 1; j < size; ++j) {
-				    	if (words[j] == "一") {
+				    	if (words[j].matches("[一]")) {
 				    		tmp += "1";
-				    	} else if (words[j] == "二") {
+				    	} else if (words[j].matches("[二]")) {
 				    		tmp += "2";
-				    	} else if (words[j] == "三") {
+				    	} else if (words[j].matches("[三]")) {
 				    		tmp += "3";
-				    	} else if (words[j] == "四") {
+				    	} else if (words[j].matches( "[四]")) {
 				    		tmp += "4";
-				    	} else if (words[j] == "五") {
+				    	} else if (words[j].matches( "[五]")) {
 				    		tmp += "5";
-				    	} else if (words[j] == "六") {
+				    	} else if (words[j].matches( "[六]")) {
 				    		tmp += "6";
-				    	} else if (words[j] == "七") {
+				    	} else if (words[j].matches("[七]")) {
 				    		tmp += "7";
-				    	} else if (words[j] == "八") {
+				    	} else if (words[j].matches("[八]")) {
 				    		tmp += "8";
-				    	} else if (words[j] == "九") {
+				    	} else if (words[j].matches("[九]")) {
 				    		tmp += "9";
 				    	}
 				    }
