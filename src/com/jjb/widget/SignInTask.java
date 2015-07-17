@@ -9,10 +9,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.jjb.activity.IndexActivity;
-import com.jjb.activity.MainActivity;
 import com.jjb.util.Communicator;
 import com.jjb.util.Constant;
 import com.jjb.util.Debugger;
+import com.jjb.util.LogUtil;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,16 +20,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class SignInTask extends AsyncTask<String, Void, String> {
 	protected Context context;
-	protected boolean isSuccess = false;
 	protected String targetMethod = "signIn";
 	
 	protected String accessKey;
 	protected String expiresTime;
 	protected int userId;
+	
+	private boolean isSuccess = false;
+	private String message;
 	
 	public SignInTask(Context context) {
 		this.context = context;
@@ -80,10 +81,10 @@ public class SignInTask extends AsyncTask<String, Void, String> {
 			
 			isSuccess = true;
 		} catch (SocketTimeoutException e) {
-			Debugger.DisplayToast(context, "连接超时！");
+			message = "连接超时！";
 		} catch (JSONException e) {
-			Debugger.DisplayToast(context, "啊哦，不知道怎么了~");
-			Log.e("JJB", "Malformed response from server: " + result);
+			message = "啊哦，不知道怎么了~";
+			LogUtil.e("Malformed response from server: " + result);
 		}
 		return userID;
 	}
@@ -103,7 +104,7 @@ public class SignInTask extends AsyncTask<String, Void, String> {
 			Intent intent = new Intent(context,IndexActivity.class);
 			context.startActivity(intent);
 		} else {
-			Debugger.DisplayToast(context, userID);
+			Debugger.DisplayToast(context, message);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.jjb.activity;
 
 import java.net.SocketTimeoutException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import com.jjb.util.Constant;
 import com.jjb.util.DBManager;
 import com.jjb.util.Debugger;
 import com.jjb.util.Item;
+import com.jjb.util.LogUtil;
 import com.jjb.widget.SinkingView;
 
 import android.content.Intent;
@@ -23,7 +25,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -121,7 +122,8 @@ public class IndexActivity extends BaseActivity {
 		});
 		
 		// 与服务器同步数据
-		preferences.getString(Constant.PREF_LAST_SYNC, null);
+		lastSync = preferences.getString(Constant.PREF_LAST_SYNC, null);
+		LogUtil.w("Getting last sync date from SharedPreferences: " + lastSync);
 		new AsyncTask<Void, Void, Void>() {
 			DBManager db = new DBManager(IndexActivity.this);
 			
@@ -139,7 +141,7 @@ public class IndexActivity extends BaseActivity {
 				} catch (SocketTimeoutException e) {
 					Debugger.DisplayToast(IndexActivity.this, "连接超时！");
 				} catch (JSONException e) {
-					Log.e("JJB", "Malformed response from server: " + rawResponse);
+					LogUtil.e("Malformed response from server when trying to sync from Server: " + rawResponse);
 				}
 
 				JSONObject currentObject = null;
@@ -147,7 +149,7 @@ public class IndexActivity extends BaseActivity {
 				for (int i = 0; resultArr != null && i < resultArr.length(); i++) {
 					
 					try {
-						currentObject = resultArr.getJSONObject(i);
+						currentObject = new JSONObject(resultArr.getString(i));
 						iteratePointer = new Item();
 						iteratePointer.setItemId(currentObject.getInt("itemId"));
 						iteratePointer.setUserId(currentObject.getInt("userId"));
@@ -165,9 +167,19 @@ public class IndexActivity extends BaseActivity {
 						if (result == -1) { // error occurred when inserting, (probably results from duplicate id), try update
 							db.updateItem(iteratePointer);
 						}
+					} catch (JSONException e) {
+						LogUtil.e("Malfromed record in server response: index " + i + ", auto skipping.");
+						LogUtil.e("Failed to parse the JSON Response from server");
+						LogUtil.e("    server response is: " + rawResponse);
+						e.printStackTrace();
+					} catch (ParseException e) {
+						LogUtil.e("Malfromed record in server response: index " + i + ", auto skipping.");
+						LogUtil.e("Failed to parse the DateTime from server");
+						LogUtil.e("    server response is: " + rawResponse);
+						e.printStackTrace();
 					} catch (Exception e) {
-						Log.e("JJB", "Malfromed record in server response: index " + i + ", auto skipping.");
-						Log.e("JJB", "    server response is: " + rawResponse);
+						LogUtil.e("Failed to sync from server due to unknown error.");
+						e.printStackTrace();
 					}
 				}
 				
@@ -188,7 +200,8 @@ public class IndexActivity extends BaseActivity {
 						currentObject.put("modifiedTime", Constant.DATETIME_FORMAT.format(item.getModifiedTime()));
 						resultArr.put(currentObject);
 					} catch (JSONException e) {
-						Log.e("JJB", "Malformed record, skiping: " + item.toString());
+						LogUtil.e("Malformed record in SQLite database, auto skiping: " + item.toString());
+						e.printStackTrace();
 					}
 				}
 				// 有item需要上传
@@ -199,7 +212,7 @@ public class IndexActivity extends BaseActivity {
 					try {
 						rawResponse = Communicator.sendPost("syncToServer", "items=" + resultArr.toString() + "&userId=" + Constant.USER_ID + "&accessKey=" + Constant.ACCESS_KEY);
 					} catch (SocketTimeoutException e) {
-						Log.e("JJB", "Socket timeouted when try to upload items");
+						LogUtil.e("Socket timeouted when try to upload items");
 						return null;
 					}
 					int successCount = 0;
@@ -207,7 +220,7 @@ public class IndexActivity extends BaseActivity {
 						response = new JSONObject(rawResponse);
 						successCount = response.getInt("syncCount");
 					} catch (JSONException e) {
-						Log.e("JJB", "Malformed response from server: " + rawResponse);
+						LogUtil.e("Malformed response from server: " + rawResponse);
 					}
 					// 所有item同步成功
 					if (successCount == resultArr.length()) {

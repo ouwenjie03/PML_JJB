@@ -23,7 +23,7 @@ public class Communicator {
 		InputStream in = null;
 		try {
 			url = new URL("http://" + HOST_NAME + method);
-			Log.e("get url", "http://" + HOST_NAME + method);
+			Log.i("get url", "http://" + HOST_NAME + method);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
 			connection.setDoInput(true);
@@ -37,10 +37,9 @@ public class Communicator {
 				result = line + "\n";
 			}
 			if (result == null)
-				Log.e("noresponse", "nores");
+				Log.e("404", "No Response From Server!");
 			r.close();
 			connection.disconnect();
-			Log.e("get result", result);
 			return result;
 
 		} catch (SocketTimeoutException e) {
@@ -48,7 +47,7 @@ public class Communicator {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Log.e("get result", result);
+		Log.i("get result", result);
 		return result;
 
 	}
@@ -60,7 +59,7 @@ public class Communicator {
 		InputStreamReader in = null;
 		try {
 			url = new URL("http://" + HOST_NAME + method);
-			Log.e("post url", "http://" + HOST_NAME + method  +"?"+ content);
+			Log.i("post url", "http://" + HOST_NAME + method + "?" + content);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
@@ -86,7 +85,6 @@ public class Communicator {
 			throw e;
 		} catch (Exception e) {
 			e.printStackTrace();
-			Log.e("error", e.toString());
 		} finally {
 			if (connection != null) {
 				connection.disconnect();
@@ -96,11 +94,10 @@ public class Communicator {
 					in.close();
 				} catch (IOException e) {
 					e.printStackTrace();
-					Log.e("error1", e.toString());
 				}
 			}
 		}
-		Log.e("post result", result);
+		Log.i("post result", result);
 		return result;
 	}
 }

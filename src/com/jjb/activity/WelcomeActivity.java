@@ -5,6 +5,7 @@ import java.util.Date;
 
 import com.jjb.R;
 import com.jjb.util.Constant;
+import com.jjb.util.LogUtil;
 import com.jjb.widget.SignInTask;
 
 import android.app.Activity;
@@ -29,13 +30,17 @@ public class WelcomeActivity extends Activity {
 		SharedPreferences settings = getSharedPreferences(Constant.PREF_USER_INFO, Activity.MODE_PRIVATE);
 		accessKey = settings.getString(Constant.PREF_ACCESS_KEY, "");
 		userId = settings.getInt(Constant.PREF_USERID, 0);
+		LogUtil.i("Getting user info from SharedPreferences");
+		
 		Date now = new Date();
 		Date expiresTime = null;
+		String rawString = null;
 		try {
-			expiresTime = Constant.DATETIME_FORMAT.parse(
-					settings.getString(Constant.PREF_EXPIRES_TIME, Constant.DATETIME_FORMAT.format(now)));
+			rawString = settings.getString(Constant.PREF_EXPIRES_TIME, Constant.DATETIME_FORMAT.format(now));
+			expiresTime = Constant.DATETIME_FORMAT.parse(rawString);
 		} catch (ParseException e) {
-			Log.e("JJB", "Malformed expiresTime in SharedPreferences");
+			LogUtil.e("Malformed \"expiresTime\" in SharedPreferences: " + rawString);
+			e.printStackTrace();
 		}
 		
 		if (expiresTime != null && expiresTime.after(now)) {

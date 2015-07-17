@@ -151,7 +151,7 @@ public class DBManager {
 		if (c.moveToNext()) {
 			res = new Item();
 			try {
-				res.setItemId(c.getInt(c.getColumnIndex("itemid")));
+				res.setItemId(c.getInt(0));
 				res.setUserId(c.getInt(c.getColumnIndex("userid")));
 				res.setName(c.getString(c.getColumnIndex("name")));
 				res.setPrice(c.getDouble(c.getColumnIndex("price")));

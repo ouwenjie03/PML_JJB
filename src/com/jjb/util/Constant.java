@@ -13,7 +13,6 @@ public class Constant {
 	public static String ACCESS_KEY = "";
 	
 	// 服务器相关常量
-	//public static final String HOST_NAME = "172.18.35.91:8080/JJB_Server/";
 	public static final String HOST_NAME = "120.25.163.80:8080/JJB_Server/";
 	
 	// 数据库相关常量
